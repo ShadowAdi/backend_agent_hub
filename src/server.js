@@ -19,7 +19,7 @@ app.use(
 app.use(express.json());
 
 app.use("/api/health", healthRouter);
-app.use("/api/user", UserRouter);
+app.use("/api/users", UserRouter);
 app.use("/api/auth", authRouter);
 
 
