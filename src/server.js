@@ -6,6 +6,7 @@ import { PORT } from "./config/envs.js";
 import { healthRouter } from "./routes/healthRouter.js";
 import { UserRouter } from "./routes/userRouter.js";
 import { CustomErrorHandler } from "./middlewares/CustomErrorHandler.js";
+import { authRouter } from "./routes/authRouter.js";
 
 const app = express();
 app.use(
@@ -19,6 +20,8 @@ app.use(express.json());
 
 app.use("/api/health", healthRouter);
 app.use("/api/user", UserRouter);
+app.use("/api/auth", authRouter);
+
 
 app.use(CustomErrorHandler)
 
