@@ -43,3 +43,35 @@ export const GetSingleUser = CustomTryCatch(async (req, res, next) => {
     isUserExist,
   });
 });
+
+export const DeleteUser = CustomTryCatch(async (req, res, next) => {
+  const user = req.user;
+  if (!user || !user.email || !user.sub) {
+    logger.error(`Failed to get the authenticated user ${user}`);
+    console.log(`Failed to get the authenticated user ${user}`);
+    return next(
+      new AppError(`Failed to get the authenticated user ${user}`, 404)
+    );
+  }
+
+  const userFound = await UserModel.findById(user.sub).select("-password");
+  if (!userFound) {
+    logger.error(`User With Id Do Not Exist: ${sub}`);
+    console.log(`User With Id Do Not Exist: ${sub}`);
+    return next(new AppError(`User With Id Do Not Exist: ${sub}`, 404));
+  }
+
+  if (userFound._id !== sub) {
+    logger.error(`Only Authenticated User can delete his account`);
+    console.log(`Only Authenticated User can delete his account`);
+    return next(
+      new AppError(`Only Authenticated User can delete his account`, 404)
+    );
+  }
+
+  await UserModel.findByIdAndDelete(userFound._id);
+  return res.status(200).json({
+    message: "User is deleted",
+    success: true,
+  });
+});
