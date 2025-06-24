@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  CreateUserAgent,
   GetAgent,
   GetAllAgents,
   GetUserAgents,
@@ -9,4 +10,6 @@ export const agentRouter = express.Router();
 
 agentRouter.get("/", GetAllAgents);
 agentRouter.get("/", CheckAuth, GetUserAgents);
+agentRouter.post("/agent", CheckAuth, CreateUserAgent);
+
 agentRouter.get("/agent/:agentId", GetAgent);

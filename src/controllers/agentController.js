@@ -1,3 +1,4 @@
+import { GEMINI_SECRET_KEY } from "../config/envs.js";
 import { logger } from "../config/loggerConfig.js";
 import { AgentModel } from "../models/Agent.js";
 import { AppError } from "../utils/AppError.js";
@@ -43,5 +44,39 @@ export const GetUserAgents = CustomTryCatch(async (req, res, next) => {
     userAgents,
     success: true,
     agentCounts: userAgents.length,
+  });
+});
+
+export const CreateUserAgent = CustomTryCatch(async (req, res, next) => {
+  const data = req.body;
+  const user = req.user;
+  const { sub, email } = user;
+
+  const loggedInUser = await IsUserExist(user, email, sub, next);
+  const isAgentExist = await AgentModel.findOne({
+    name: data.name,
+    userId: loggedInUser._id,
+  });
+  if (isAgentExist) {
+    logger.error(`Agent With Same Name already Exists`);
+    return next(new AppError(`Agent With Same Name already Exists`, 404));
+  }
+
+  data.userId = loggedInUser._id;
+  if (!GEMINI_SECRET_KEY) {
+    logger.error(`Api Key is neither provided not exist in default`);
+    return next(
+      new AppError(`Api Key is neither provided not exist in default`, 404)
+    );
+  }
+  data.apiKey = GEMINI_SECRET_KEY;
+
+  const createdAgent = await AgentModel(data);
+
+  await createdAgent.save();
+  return res.status(201).json({
+    message: "Agent Is Created",
+    createdAgent,
+    success: true,
   });
 });
