@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 import { logger } from "../loggerConfig.js";
 import { AppError } from "../../utils/AppError.js";
+import { mongodb_uri } from "../envs.js";
 
-export const DBConnect = async (mongodb_uri) => {
+export const DBConnect = async () => {
   if (!mongodb_uri) {
     logger.error(`Failed to connect to DB. MongoDB uri is not provided`);
     console.log(`Failed to connect to DB. MongoDB uri is not provided`);
