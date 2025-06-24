@@ -9,18 +9,30 @@ export const validateUserSchema = (schema) => {
       const rule = schema.paths[key].options;
       const value = req.body[key];
 
-      if (rule.required && (value === undefined || value === null || value === "")) {
+      if (
+        rule.required &&
+        (value === undefined || value === null || value === "")
+      ) {
         logger.error(`Required field missing: ${key}`);
         return next(new AppError(`Required field missing: ${key}`, 400));
       }
 
       if (rule.type && value !== undefined && value !== null) {
-        const expectedType = rule.type.name.toLowerCase();
-        const actualType = typeof value;
+        let expectedType = "";
+        if (Array.isArray(rule.type)) {
+          expectedType = "array";
+        } else if (typeof rule.type === "function" && rule.type.name) {
+          expectedType = rule.type.name.toLowerCase();
+        } else {
+          expectedType = typeof rule.default;
+        }
+        const actualType = Array.isArray(value) ? "array" : typeof value;
 
         if (expectedType !== actualType) {
           logger.error(`Type mismatch: ${key} must be a ${expectedType}`);
-          return next(new AppError(`Type mismatch: ${key} must be a ${expectedType}`, 400));
+          return next(
+            new AppError(`Type mismatch: ${key} must be a ${expectedType}`, 400)
+          );
         }
       }
 

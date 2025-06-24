@@ -6,7 +6,7 @@ import bcrypt from "bcrypt";
 
 export const SignupUser = CustomTryCatch(async (req, res, next) => {
   const isUserExist = await UserModel.findOne({ email: req.body.email });
-  if (!isUserExist) {
+  if (isUserExist) {
     logger.error(`User already exists with the mail: ${email}`);
     return next(
       new AppError(`User already exists with the mail: ${email}`, 404)
