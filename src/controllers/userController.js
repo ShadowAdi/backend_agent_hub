@@ -24,3 +24,22 @@ export const SignupUser = CustomTryCatch(async (req, res, next) => {
     success: true,
   });
 });
+
+export const GetSingleUser = CustomTryCatch(async (req, res, next) => {
+  const userId = req.params.userId;
+  if (!userId) {
+    logger.error(`Failed to get the userId ${userId}`);
+    console.log(`Failed to get the userId ${userId}`);
+    return next(new AppError(`Failed to get the userId ${userId}`, 404));
+  }
+  const isUserExist = await UserModel.findById(userId).select("-password");
+  if (!isUserExist) {
+    logger.error(`User With Id Do Not Exist: ${sub}`);
+    console.log(`User With Id Do Not Exist: ${sub}`);
+    return next(new AppError(`User With Id Do Not Exist: ${sub}`, 404));
+  }
+  return res.status(200).json({
+    success: true,
+    isUserExist,
+  });
+});
