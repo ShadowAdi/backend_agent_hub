@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { logger } from "../loggerConfig";
-import { AppError } from "../../utils/AppError";
+import { logger } from "../loggerConfig.js";
+import { AppError } from "../../utils/AppError.js";
 
 export const DBConnect = async (mongodb_uri) => {
   if (!mongodb_uri) {
