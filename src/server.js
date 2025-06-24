@@ -5,6 +5,7 @@ import { DBConnect } from "./config/db/db.js";
 import { PORT } from "./config/envs.js";
 import { healthRouter } from "./routes/healthRouter.js";
 import { UserRouter } from "./routes/userRouter.js";
+import { CustomErrorHandler } from "./middlewares/CustomErrorHandler.js";
 
 const app = express();
 app.use(
@@ -18,6 +19,8 @@ app.use(express.json());
 
 app.use("/api/health", healthRouter);
 app.use("/api/user", UserRouter);
+
+app.use(CustomErrorHandler)
 
 
 app.listen(PORT, () => {
