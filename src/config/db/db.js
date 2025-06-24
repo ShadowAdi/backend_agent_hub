@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
 import { logger } from "../loggerConfig";
+import { AppError } from "../../utils/AppError";
 
 export const DBConnect = async (mongodb_uri) => {
   if (!mongodb_uri) {
     logger.error(`Failed to connect to DB. MongoDB uri is not provided`);
     console.log(`Failed to connect to DB. MongoDB uri is not provided`);
-    return;
+    throw new AppError(`Internal Server Error: DB URL is undefined`, 500);
   }
 
   try {
@@ -14,5 +15,6 @@ export const DBConnect = async (mongodb_uri) => {
   } catch (error) {
     console.error("Failed to connect to the database", error);
     logger.error("Failed to connect to the database: " + error.message);
+    throw new AppError(`Internal Server Error: DB URL is undefined`, 500);
   }
 };
