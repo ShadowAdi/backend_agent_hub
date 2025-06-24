@@ -44,6 +44,16 @@ export const GetSingleUser = CustomTryCatch(async (req, res, next) => {
   });
 });
 
+export const GetUsers = CustomTryCatch(async (req, res, next) => {
+  const users = await UserModel.find().select("-password");
+
+  return res.status(200).json({
+    success: true,
+    users,
+    noOfUsers:users.length
+  });
+});
+
 export const DeleteUser = CustomTryCatch(async (req, res, next) => {
   const user = req.user;
   const { sub, email } = user;
