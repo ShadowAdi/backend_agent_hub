@@ -36,7 +36,9 @@ export const GetUserAgents = CustomTryCatch(async (req, res, next) => {
   const { sub, email } = user;
 
   const loggedInUser = await IsUserExist(user, email, sub, next);
-  const userAgents = await AgentModel.find({ userId: loggedInUser._id });
+  const userAgents = await AgentModel.find({ userId: loggedInUser._id })
+    .sort({ createdAt: -1 })
+    .populate("userId name email profilePic");
   return res.status(200).json({
     userAgents,
     success: true,
