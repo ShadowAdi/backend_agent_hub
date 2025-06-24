@@ -1,6 +1,7 @@
 import { logger } from "../config/loggerConfig.js";
 import { UserModel } from "../models/User.js";
 import { AppError } from "../utils/AppError.js";
+import { IsUserExist } from "../utils/AuthCheck.js";
 import { CustomTryCatch } from "../utils/CustomTryCatch.js";
 import bcrypt from "bcrypt";
 
@@ -50,7 +51,25 @@ export const GetUsers = CustomTryCatch(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     users,
-    noOfUsers:users.length
+    noOfUsers: users.length,
+  });
+});
+
+export const UpdateUser = CustomTryCatch(async (req, res, next) => {
+  const user = req.user;
+  const { sub, email } = user;
+
+  const loggedInUser = await IsUserExist(user, email, sub);
+
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    loggedInUser._id,
+    req.body,
+    { new: true }
+  );
+  return res.status(200).json({
+    message: "User updated successfully",
+    success: true,
+    updatedUser,
   });
 });
 
@@ -58,26 +77,9 @@ export const DeleteUser = CustomTryCatch(async (req, res, next) => {
   const user = req.user;
   const { sub, email } = user;
 
-  if (!user || !email || !sub) {
-    logger.error(`Failed to get the authenticated user`);
-    return next(new AppError(`Failed to get the authenticated user`, 404));
-  }
+  const loggedInUser = await IsUserExist(user, email, sub);
 
-  const userFound = await UserModel.findById(sub).select("-password");
-  if (!userFound) {
-    logger.error(`User With Id Does Not Exist: ${sub}`);
-    return next(new AppError(`User With Id Does Not Exist: ${sub}`, 404));
-  }
-
-  // Use .equals() to compare ObjectIds safely
-  if (!userFound._id.equals(sub)) {
-    logger.error(`Only the authenticated user can delete their account`);
-    return next(
-      new AppError(`Only the authenticated user can delete their account`, 403)
-    );
-  }
-
-  await UserModel.findByIdAndDelete(userFound._id);
+  await UserModel.findByIdAndDelete(loggedInUser._id);
 
   return res.status(200).json({
     message: "User is deleted",
