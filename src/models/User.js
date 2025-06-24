@@ -60,11 +60,11 @@ const UserSchema = new mongoose.Schema(
       default: "",
     },
     reasonToUse: {
-      type: [String], // e.g., "Studying", "Research", "Programming Help", etc.
+      type: [String],
       default: [],
     },
     interests: {
-      type: [String], // e.g., ["AI", "Web Development", "Competitive Programming"]
+      type: [String], 
       default: [],
     },
     knownProgrammingLanguages: {
