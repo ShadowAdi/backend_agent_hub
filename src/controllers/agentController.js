@@ -11,6 +11,7 @@ export const GetAllAgents = CustomTryCatch(async (req, res) => {
   return res.status(200).json({
     success: true,
     agents,
+    agentCounts: agents.length,
   });
 });
 
@@ -34,7 +35,11 @@ export const GetUserAgents = CustomTryCatch(async (req, res, next) => {
   const user = req.user;
   const { sub, email } = user;
 
-  const loggedInUser = await IsUserExist(user, email, sub,next);
-
-
+  const loggedInUser = await IsUserExist(user, email, sub, next);
+  const userAgents = await AgentModel.find({ userId: loggedInUser._id });
+  return res.status(200).json({
+    userAgents,
+    success: true,
+    agentCounts: userAgents.length,
+  });
 });
