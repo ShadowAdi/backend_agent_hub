@@ -94,30 +94,41 @@ export const CreateUserAgent = CustomTryCatch(async (req, res, next) => {
 });
 
 export const DeleteAgent = CustomTryCatch(async (req, res, next) => {
-  const { sub, email } = user;
+  const { sub, email } = req.user;
   const { agentId } = req.params;
 
-  const loggedInUser = await IsUserExist(user, email, sub, next);
-  const isAgentExist = await AgentModel.findById(agentId).populate(
-    "userId name email profilePic"
-  );
+  const loggedInUser = await IsUserExist(req.user, email, sub, next);
 
-  if (isAgentExist.userId !== loggedInUser._id) {
+  const isAgentExist = await AgentModel.findById(agentId).populate("userId");
+
+  if (!isAgentExist) {
+    return next(new AppError("Agent not found", 404));
+  }
+
+  if (isAgentExist.userId.toString() !== loggedInUser._id.toString()) {
     logger.error(
-      `You are not the creator of this agent the creator of this agent email is:${isAgentExist.email}and the login user email is: ${email}`
+      `You are not the creator of this agent. Creator email: ${isAgentExist.userId.email}, Logged-in user email: ${email}`
     );
     return next(
       new AppError(
-        `You are not the creator of this agent the creator of this agent email is:${isAgentExist.email}and the login user email is: ${email}`,
-        404
+        `You are not the creator of this agent. Creator email: ${isAgentExist.userId.email}, Logged-in user email: ${email}`,
+        403
       )
     );
   }
 
+  const chats = await ChatModel.find({ agentId });
+
+  const chatIds = chats.map((chat) => chat._id);
+
+  await MessageModel.deleteMany({ chatId: { $in: chatIds } });
+
+  await ChatModel.deleteMany({ agentId });
+
   await AgentModel.findByIdAndDelete(agentId);
-  await ChatModel.find({ agentId: agentId });
+
   return res.status(200).json({
-    message: "Agent Has Been Deleted",
+    message: "Agent, its chats, and related messages have been deleted.",
     success: true,
   });
 });
