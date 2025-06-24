@@ -46,30 +46,29 @@ export const GetSingleUser = CustomTryCatch(async (req, res, next) => {
 
 export const DeleteUser = CustomTryCatch(async (req, res, next) => {
   const user = req.user;
-  if (!user || !user.email || !user.sub) {
-    logger.error(`Failed to get the authenticated user ${user}`);
-    console.log(`Failed to get the authenticated user ${user}`);
-    return next(
-      new AppError(`Failed to get the authenticated user ${user}`, 404)
-    );
+  const { sub, email } = user;
+
+  if (!user || !email || !sub) {
+    logger.error(`Failed to get the authenticated user`);
+    return next(new AppError(`Failed to get the authenticated user`, 404));
   }
 
-  const userFound = await UserModel.findById(user.sub).select("-password");
+  const userFound = await UserModel.findById(sub).select("-password");
   if (!userFound) {
-    logger.error(`User With Id Do Not Exist: ${sub}`);
-    console.log(`User With Id Do Not Exist: ${sub}`);
-    return next(new AppError(`User With Id Do Not Exist: ${sub}`, 404));
+    logger.error(`User With Id Does Not Exist: ${sub}`);
+    return next(new AppError(`User With Id Does Not Exist: ${sub}`, 404));
   }
 
-  if (userFound._id !== sub) {
-    logger.error(`Only Authenticated User can delete his account`);
-    console.log(`Only Authenticated User can delete his account`);
+  // Use .equals() to compare ObjectIds safely
+  if (!userFound._id.equals(sub)) {
+    logger.error(`Only the authenticated user can delete their account`);
     return next(
-      new AppError(`Only Authenticated User can delete his account`, 404)
+      new AppError(`Only the authenticated user can delete their account`, 403)
     );
   }
 
   await UserModel.findByIdAndDelete(userFound._id);
+
   return res.status(200).json({
     message: "User is deleted",
     success: true,
