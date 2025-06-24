@@ -115,6 +115,7 @@ export const DeleteAgent = CustomTryCatch(async (req, res, next) => {
   }
 
   await AgentModel.findByIdAndDelete(agentId);
+  await ChatModel.find({ agentId: agentId });
   return res.status(200).json({
     message: "Agent Has Been Deleted",
     success: true,
