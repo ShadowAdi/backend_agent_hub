@@ -71,6 +71,10 @@ export const CreateUserAgent = CustomTryCatch(async (req, res, next) => {
   }
   data.apiKey = GEMINI_SECRET_KEY;
 
+//   if (data.type === "chat") {
+//     await Cha
+//   }
+
   const createdAgent = await AgentModel(data);
 
   await createdAgent.save();

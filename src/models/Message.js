@@ -19,3 +19,5 @@ export const MessageSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+export const MessageModel = new mongoose.Model("Message", MessageSchema);
