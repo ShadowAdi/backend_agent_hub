@@ -133,3 +133,39 @@ export const DeleteAgent = CustomTryCatch(async (req, res, next) => {
     success: true,
   });
 });
+
+export const UpdateAgent = CustomTryCatch(async (req, res, next) => {
+  const { sub, email } = req.user;
+  const { agentId } = req.params;
+  const data = req.body;
+
+  const loggedInUser = await IsUserExist(req.user, email, sub, next);
+
+  const isAgentExist = await AgentModel.findById(agentId).populate("userId");
+
+  if (!isAgentExist) {
+    return next(new AppError("Agent not found", 404));
+  }
+
+  if (isAgentExist.userId.toString() !== loggedInUser._id.toString()) {
+    logger.error(
+      `You are not the creator of this agent. Creator email: ${isAgentExist.userId.email}, Logged-in user email: ${email}`
+    );
+    return next(
+      new AppError(
+        `You are not the creator of this agent. Creator email: ${isAgentExist.userId.email}, Logged-in user email: ${email}`,
+        403
+      )
+    );
+  }
+
+  const updatedAgent = await AgentModel.findByIdAndUpdate(agentId, data, {
+    new: true,
+  });
+
+  return res.status(200).json({
+    message: "Agent have been updated.",
+    success: true,
+    updatedAgent,
+  });
+});

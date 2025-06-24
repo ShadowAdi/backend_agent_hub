@@ -48,3 +48,62 @@ export const AgentValidator = async (req, res, next) => {
 
   next();
 };
+
+
+
+export const validateAgentUpdateSchema = (schema) => {
+  return (req, res, next) => {
+    for (let key in req.body) {
+      // Skip invalid or immutable fields
+      if (!schema.paths[key] || ["__v", "_id", "createdAt", "updatedAt"].includes(key)) continue;
+
+      const rule = schema.paths[key].options;
+      const value = req.body[key];
+
+      // Type checking
+      if (rule.type && value !== undefined && value !== null) {
+        let expectedType = "";
+        if (Array.isArray(rule.type)) {
+          expectedType = "array";
+        } else if (typeof rule.type === "function" && rule.type.name) {
+          expectedType = rule.type.name.toLowerCase();
+        } else {
+          expectedType = typeof rule.default;
+        }
+
+        const actualType = Array.isArray(value) ? "array" : typeof value;
+
+        if (expectedType !== actualType) {
+          logger.error(`Type mismatch: '${key}' must be a ${expectedType}`);
+          return next(new AppError(`Type mismatch: '${key}' must be a ${expectedType}`, 400));
+        }
+      }
+
+      // Enum validation
+      if (rule.enum && !rule.enum.includes(value)) {
+        logger.error(`Invalid value for '${key}'. Allowed: ${rule.enum.join(", ")}`);
+        return next(
+          new AppError(`'${key}' must be one of: ${rule.enum.join(", ")}`, 400)
+        );
+      }
+
+      // Min/Max validation for numbers
+      if (typeof value === "number") {
+        if (rule.min !== undefined && value < rule.min) {
+          return next(new AppError(`'${key}' must be at least ${rule.min}`, 400));
+        }
+        if (rule.max !== undefined && value > rule.max) {
+          return next(new AppError(`'${key}' must be at most ${rule.max}`, 400));
+        }
+      }
+
+      // Optional: regex / pattern validation
+      if (rule.pattern && !rule.pattern.test(value)) {
+        logger.error(`Invalid pattern for '${key}'`);
+        return next(new AppError(`Invalid pattern for '${key}'`, 400));
+      }
+    }
+
+    next();
+  };
+};
