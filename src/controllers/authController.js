@@ -3,7 +3,6 @@ import { UserModel } from "../models/User.js";
 import { AppError } from "../utils/AppError.js";
 import { CustomTryCatch } from "../utils/CustomTryCatch.js";
 import bcrypt from "bcrypt";
-import jsonwebtoken from "jsonwebtoken";
 import { TokenGenerator } from "../utils/TokenGenerator.js";
 
 export const SigninUser = CustomTryCatch(async (req, res, next) => {
@@ -41,4 +40,8 @@ export const SigninUser = CustomTryCatch(async (req, res, next) => {
     success: true,
     user
   });
+});
+
+export const GetUser = CustomTryCatch(async (req, res, next) => {
+ 
 });
