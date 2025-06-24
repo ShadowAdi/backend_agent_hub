@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 export const CheckAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startswith("Bearer ")) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       const message = `Token not provided or invalid format. Header: ${authHeader}`;
       logger.error(message);
       return next(new AppError(message, 401));
