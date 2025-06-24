@@ -20,7 +20,6 @@ export const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      lowercase: true,
     },
     age: {
       type: Number,
