@@ -4,15 +4,11 @@ export const MessageSchema = new mongoose.Schema(
   {
     chatId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "chat",
-    },
-    sender: {
-      type: mongoose.Schema.Types.ObjectId,
-      enum: ["user", "agent"],
+      ref: "Chat",
       required: true,
     },
-    receiver: {
-      type: mongoose.Schema.Types.ObjectId,
+    senderRole: {
+      type: String,
       enum: ["user", "agent"],
       required: true,
     },
@@ -21,7 +17,5 @@ export const MessageSchema = new mongoose.Schema(
       required: true,
     },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
