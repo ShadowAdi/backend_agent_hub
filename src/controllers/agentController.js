@@ -92,3 +92,31 @@ export const CreateUserAgent = CustomTryCatch(async (req, res, next) => {
     chatId: newChatModel,
   });
 });
+
+export const DeleteAgent = CustomTryCatch(async (req, res, next) => {
+  const { sub, email } = user;
+  const { agentId } = req.params;
+
+  const loggedInUser = await IsUserExist(user, email, sub, next);
+  const isAgentExist = await AgentModel.findById(agentId).populate(
+    "userId name email profilePic"
+  );
+
+  if (isAgentExist.userId !== loggedInUser._id) {
+    logger.error(
+      `You are not the creator of this agent the creator of this agent email is:${isAgentExist.email}and the login user email is: ${email}`
+    );
+    return next(
+      new AppError(
+        `You are not the creator of this agent the creator of this agent email is:${isAgentExist.email}and the login user email is: ${email}`,
+        404
+      )
+    );
+  }
+
+  await AgentModel.findByIdAndDelete(agentId);
+  return res.status(200).json({
+    message: "Agent Has Been Deleted",
+    success: true,
+  });
+});
