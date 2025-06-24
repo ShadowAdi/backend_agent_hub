@@ -38,10 +38,38 @@ export const SigninUser = CustomTryCatch(async (req, res, next) => {
     token,
     message: "Login Successfull",
     success: true,
-    user
+    user,
   });
 });
 
 export const GetUser = CustomTryCatch(async (req, res, next) => {
- 
+  const user = req.user;
+  if (!user) {
+    logger.error(`Failed to get the authenticated user ${user}`);
+    console.log(`Failed to get the authenticated user ${user}`);
+    return next(
+      new AppError(`Failed to get the authenticated user ${user}`, 404)
+    );
+  }
+
+  const { email, sub } = user;
+
+  if (!email || !sub) {
+    logger.error(`Failed to get the authenticated user ${sub}`);
+    console.log(`Failed to get the authenticated user ${sub}`);
+    return next(
+      new AppError(`Failed to get the authenticated user ${sub}`, 404)
+    );
+  }
+
+  const userFound = await UserModel.findById(sub).select("-password");
+  if (!userFound) {
+    logger.error(`User With Id Do Not Exist: ${sub}`);
+    console.log(`User With Id Do Not Exist: ${sub}`);
+    return next(new AppError(`User With Id Do Not Exist: ${sub}`, 404));
+  }
+  return res.status(200).json({
+    success: true,
+    user: userFound,
+  });
 });
