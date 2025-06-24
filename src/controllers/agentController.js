@@ -2,6 +2,7 @@ import { GEMINI_SECRET_KEY } from "../config/envs.js";
 import { logger } from "../config/loggerConfig.js";
 import { AgentModel } from "../models/Agent.js";
 import { ChatModel } from "../models/Chat.js";
+import { MessageModel } from "../models/Message.js";
 import { AppError } from "../utils/AppError.js";
 import { IsUserExist } from "../utils/AuthCheck.js";
 import { CustomTryCatch } from "../utils/CustomTryCatch.js";
