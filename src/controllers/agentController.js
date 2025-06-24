@@ -1,6 +1,7 @@
 import { GEMINI_SECRET_KEY } from "../config/envs.js";
 import { logger } from "../config/loggerConfig.js";
 import { AgentModel } from "../models/Agent.js";
+import { ChatModel } from "../models/Chat.js";
 import { AppError } from "../utils/AppError.js";
 import { IsUserExist } from "../utils/AuthCheck.js";
 import { CustomTryCatch } from "../utils/CustomTryCatch.js";
@@ -40,6 +41,7 @@ export const GetUserAgents = CustomTryCatch(async (req, res, next) => {
   const userAgents = await AgentModel.find({ userId: loggedInUser._id })
     .sort({ createdAt: -1 })
     .populate("userId name email profilePic");
+
   return res.status(200).json({
     userAgents,
     success: true,
@@ -71,16 +73,22 @@ export const CreateUserAgent = CustomTryCatch(async (req, res, next) => {
   }
   data.apiKey = GEMINI_SECRET_KEY;
 
-//   if (data.type === "chat") {
-//     await Cha
-//   }
-
   const createdAgent = await AgentModel(data);
+  let newChatModel;
 
   await createdAgent.save();
+  if (data.type === "chat") {
+    newChatModel = new ChatModel.create({
+      agentId: createdAgent._id,
+      userId: loggedInUser._id,
+      title: `${data.name} Chat`,
+    });
+    await newChatModel.save();
+  }
   return res.status(201).json({
     message: "Agent Is Created",
     createdAgent,
     success: true,
+    chatId: newChatModel,
   });
 });
