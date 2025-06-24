@@ -2,7 +2,7 @@ import { logger } from "../config/loggerConfig.js";
 import { UserModel } from "../models/User.js";
 import { AppError } from "./AppError.js";
 
-export const IsUserExist = async (user, email, sub) => {
+export const IsUserExist = async (user, email, sub,next) => {
   try {
     if (!user || !email || !sub) {
       logger.error(`Failed to get the authenticated user`);

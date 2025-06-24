@@ -1,6 +1,7 @@
 import { logger } from "../config/loggerConfig.js";
 import { AgentModel } from "../models/Agent.js";
 import { AppError } from "../utils/AppError.js";
+import { IsUserExist } from "../utils/AuthCheck.js";
 import { CustomTryCatch } from "../utils/CustomTryCatch.js";
 
 export const GetAllAgents = CustomTryCatch(async (req, res) => {
@@ -27,4 +28,13 @@ export const GetAgent = CustomTryCatch(async (req, res) => {
     success: true,
     isAgentExist,
   });
+});
+
+export const GetUserAgents = CustomTryCatch(async (req, res, next) => {
+  const user = req.user;
+  const { sub, email } = user;
+
+  const loggedInUser = await IsUserExist(user, email, sub,next);
+
+
 });

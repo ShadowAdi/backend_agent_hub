@@ -59,7 +59,7 @@ export const UpdateUser = CustomTryCatch(async (req, res, next) => {
   const user = req.user;
   const { sub, email } = user;
 
-  const loggedInUser = await IsUserExist(user, email, sub);
+  const loggedInUser = await IsUserExist(user, email, subm,next);
 
   const updatedUser = await UserModel.findByIdAndUpdate(
     loggedInUser._id,
@@ -77,7 +77,7 @@ export const DeleteUser = CustomTryCatch(async (req, res, next) => {
   const user = req.user;
   const { sub, email } = user;
 
-  const loggedInUser = await IsUserExist(user, email, sub);
+  const loggedInUser = await IsUserExist(user, email, sub,next);
 
   await UserModel.findByIdAndDelete(loggedInUser._id);
 
