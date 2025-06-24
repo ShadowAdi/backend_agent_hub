@@ -3,6 +3,7 @@ import cors from "cors";
 import { logger } from "./config/loggerConfig.js";
 import { DBConnect } from "./config/db/db.js";
 import { PORT } from "./config/envs.js";
+import { healthRouter } from "./routes/healthRouter.js";
 
 const app = express();
 app.use(
@@ -14,7 +15,7 @@ app.use(
 );
 app.use(express.json());
 
-app.use("/api/health")
+app.use("/api/health", healthRouter);
 
 app.listen(PORT, () => {
   DBConnect();

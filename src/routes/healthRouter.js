@@ -1,6 +1,6 @@
 import express from "express";
+import { healthController } from "../controllers/healthController.js";
+
 export const healthRouter = express.Router();
 
-healthRouter.get("/", () => {
-  console.log("Health Route is working");
-});
+healthRouter.get("/", healthController);
