@@ -7,6 +7,7 @@ import { healthRouter } from "./routes/healthRouter.js";
 import { UserRouter } from "./routes/userRouter.js";
 import { CustomErrorHandler } from "./middlewares/CustomErrorHandler.js";
 import { authRouter } from "./routes/authRouter.js";
+import { agentRouter } from "./routes/agentRouter.js";
 
 const app = express();
 app.use(
@@ -21,6 +22,8 @@ app.use(express.json());
 app.use("/api/health", healthRouter);
 app.use("/api/users", UserRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/agents", agentRouter);
+
 
 
 app.use(CustomErrorHandler)
