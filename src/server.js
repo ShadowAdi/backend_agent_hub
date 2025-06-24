@@ -5,7 +5,16 @@ import { DBConnect } from "./config/db/db.js";
 import { PORT } from "./config/envs.js";
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    allowedHeaders: true,
+    methods: ["*"],
+    origin: ["*"],
+  })
+);
+app.use(express.json());
+
+app.use("/api/health")
 
 app.listen(PORT, () => {
   DBConnect();
