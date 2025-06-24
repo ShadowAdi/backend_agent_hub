@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { DEFAULT_PROFILE_PIC } from "../config/envs";
+import { DEFAULT_PROFILE_PIC } from "../config/envs.js";
 
 export const UserSchema = new mongoose.Schema(
   {
