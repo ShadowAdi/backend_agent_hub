@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { DEFAULT_PROFILE_PIC } from "../config/envs";
 
-const UserSchema = new mongoose.Schema(
+export const UserSchema = new mongoose.Schema(
   {
     name: {
       type: String,
